@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,27 +15,43 @@ namespace VatebraAcademy.Services.Implementations
     public class VatebraAcademyProfile : IVatebraAcademyProfile
     {
         private readonly VatebraAcademyDbContext _context;
-        public VatebraAcademyProfile(VatebraAcademyDbContext context)
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public VatebraAcademyProfile(VatebraAcademyDbContext context,
+                                     UserManager<AppUser> userManager,
+                                     RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
-        public string CreateProfile(AppUserDto appUser)
+        public async Task<string> CreateProfile(AppUserDto appUser)
         {
             try
             {
+
+                if (await _roleManager.FindByNameAsync("AppUser") == null)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("AppUser"));
+                }
+
                 var createProfile = new AppUser
                 {
                     FirstName = appUser.FirstName,
                     LastName = appUser.LastName,
                     OtherNames = appUser.OtherNames,
                     DOB = appUser.DOB,
+                    Email = appUser.Email,
                     PhoneNumber = appUser.PhoneNumber,
                     Age = appUser.Age,
                     Gender = appUser.Gender,
                     Address = appUser.Address,
+                    UserName = appUser.Email,
+                    Role = "AppUser"
                 };
 
-                _context.AppUsers.Add(createProfile);
+                IdentityResult identityResult = await _userManager.CreateAsync(createProfile, appUser.Password);
+                await _userManager.AddToRoleAsync(createProfile, "AppUser");
                 _context.SaveChanges();
                 return "Successfully Created Profile";
             }

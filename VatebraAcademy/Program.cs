@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using VatebraAcademy.Core;
 using VatebraAcademy.Data;
 using VatebraAcademy.Services.Implementations;
 using VatebraAcademy.Services.Interfaces;
@@ -14,8 +17,23 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContextPool<VatebraAcademyDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning));
 });
+
+builder.Services.AddTransient<VatebraAcademyDbContext>();
 builder.Services.AddScoped<IVatebraAcademyProfile, VatebraAcademyProfile>();
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 4;
+    options.Password.RequiredUniqueChars = 0;
+})
+    .AddEntityFrameworkStores<VatebraAcademyDbContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
