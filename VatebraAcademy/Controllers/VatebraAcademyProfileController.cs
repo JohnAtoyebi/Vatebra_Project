@@ -31,7 +31,8 @@ namespace VatebraAcademy.Api.Controllers
         [HttpPost("userprofile")]
         public async Task<IActionResult> CreateStudentProfile(AppUserDto userProfile)
         {
-            return Ok(_vatebra.CreateProfile(userProfile));
+            var getProfile = await _vatebra.CreateProfile(userProfile);
+            return Ok(getProfile);
         }
 
         [HttpDelete("userprofile/{id}")]

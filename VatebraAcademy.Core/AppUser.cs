@@ -13,11 +13,13 @@ namespace VatebraAcademy.Core
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string? OtherNames { get; set; }
+        public string Email { get; set; }
         public DateTime DOB { get; set; }
         public string PhoneNumber { get; set; }
         public string Age { get; set; }
-        public int Gender { get; set; } = (int)Enums.Gender.Male;
+        public string Gender { get; set; }
         public string Address { get; set; }
+        public string Role { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime DateUpdated { get; set; } = DateTime.Now;
     }

@@ -10,7 +10,7 @@ namespace VatebraAcademy.Services.Interfaces
 {
     public interface IVatebraAcademyProfile
     {
-        string CreateProfile(AppUserDto appUser);
+        Task<string> CreateProfile(AppUserDto appUser);
         Task<string> UpdateProfileById(string Id, AppUserDto appUser);
         Task<List<AppUser>> GetAllProfiles();
         Task<AppUser> GetProfileById(string Id);
