@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -22,15 +23,21 @@ namespace VatebraAcademy.Services.Implementations
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JwtConfig _jwtConfig;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly IMapper _mapper;
         public VatebraAcademyProfile(VatebraAcademyDbContext context,
                                      UserManager<AppUser> userManager,
                                      RoleManager<IdentityRole> roleManager,
-                                     IOptions<JwtConfig> options)
+                                     IOptions<JwtConfig> options,
+                                     SignInManager<AppUser> signInManager,
+                                     IMapper mapper)
         {
             _context = context;
             _userManager = userManager;
             _jwtConfig = options.Value;
             _roleManager = roleManager;
+            _signInManager = signInManager;
+            _mapper = mapper;
         }
         public async Task<string> CreateProfile(AppUserDto appUser)
         {
@@ -68,32 +75,56 @@ namespace VatebraAcademy.Services.Implementations
             }
         }
 
+        public async Task<LoginDto> Login(string Email, string Password)
+        {
+            try
+            {
+                var searchEmail = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == Email);
+                if (searchEmail == null) return null;
+                var signingIn = _signInManager.PasswordSignInAsync(searchEmail, Password, true, false);
+                if (signingIn == null) return null;
+                var token = await GenerateToken(searchEmail);
+                var loginDto = new LoginDto
+                {
+                    Token = token,
+                    UserId = searchEmail.Id,
+                };
+                return loginDto;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<string> DeleteProfileById(string Id)
         {
-            var searchForUser = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == Id);
+            var searchForUser = await _userManager.FindByIdAsync(Id);
             if (searchForUser == null) return $"User with {Id} doesn't exist.";
             _context.AppUsers.Remove(searchForUser);
             await _context.SaveChangesAsync();
             return "User's profile successfully deleted.";
         }
 
-        public async Task<List<AppUser>> GetAllProfiles()
+        public async Task<List<AppUserDto>> GetAllProfiles()
         {
-            var appUser = new List<AppUser>();
+            var appUser = new List<AppUserDto>();
             var searchForUser = await _context.AppUsers.ToListAsync();
             if (searchForUser == null) return appUser;
-            return searchForUser;
+            var userToReturn = _mapper.Map<List<AppUserDto>>(searchForUser);
+            return userToReturn;
         }
 
-        public async Task<AppUser> GetProfileById(string Id)
+        public async Task<AppUserDto> GetProfileById(string Id)
         {
-            var appUser = new AppUser();
-            var searchForUser = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == Id);
+            var appUser = new AppUserDto(){ };
+            var searchForUser = await _userManager.FindByIdAsync(Id);
             if (searchForUser == null) return appUser;
-            return searchForUser;
+            var userToReturn = _mapper.Map<AppUserDto>(searchForUser);
+            return userToReturn;
         }
 
-        public async Task<string> UpdateProfileById(string Id, AppUserDto appUser)
+        public async Task<string> UpdateProfileById(string Id, UserDto appUser)
         {
             var searchForUser = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == Id);
             if (searchForUser == null) return $"User with {Id} doesn't exist.";

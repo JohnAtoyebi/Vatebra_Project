@@ -24,7 +24,6 @@ builder.Services.AddDbContextPool<VatebraAcademyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning));
 });
-
 builder.Services.AddTransient<VatebraAcademyDbContext>();
 builder.Services.AddScoped<IVatebraAcademyProfile, VatebraAcademyProfile>();
 
@@ -94,7 +93,8 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = false
     };
 });
-
+builder.Services.AddServices();
+builder.Services.AddCustomConfiguredAutoMapper();
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 var app = builder.Build();
 
