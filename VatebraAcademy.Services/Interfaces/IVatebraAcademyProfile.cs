@@ -15,5 +15,6 @@ namespace VatebraAcademy.Services.Interfaces
         Task<List<AppUser>> GetAllProfiles();
         Task<AppUser> GetProfileById(string Id);
         Task<string> DeleteProfileById(string Id);
+        Task<string> GenerateToken(AppUser user);
     }
 }
