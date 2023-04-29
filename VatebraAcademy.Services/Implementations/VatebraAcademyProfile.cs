@@ -43,11 +43,11 @@ namespace VatebraAcademy.Services.Implementations
         {
             try
             {
+                var getEmail = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == appUser.Email);
+                if (getEmail != null) return null;
 
                 if (await _roleManager.FindByNameAsync("AppUser") == null)
-                {
                     await _roleManager.CreateAsync(new IdentityRole("AppUser"));
-                }
 
                 var createProfile = new AppUser
                 {
@@ -81,8 +81,8 @@ namespace VatebraAcademy.Services.Implementations
             {
                 var searchEmail = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == Email);
                 if (searchEmail == null) return null;
-                var signingIn = _signInManager.PasswordSignInAsync(searchEmail, Password, true, false);
-                if (signingIn == null) return null;
+                var signingIn = await _signInManager.PasswordSignInAsync(searchEmail, Password, true, false);
+                if (!signingIn.Succeeded) return null;
                 var token = await GenerateToken(searchEmail);
                 var loginDto = new LoginDto
                 {
@@ -100,7 +100,7 @@ namespace VatebraAcademy.Services.Implementations
         public async Task<string> DeleteProfileById(string Id)
         {
             var searchForUser = await _userManager.FindByIdAsync(Id);
-            if (searchForUser == null) return $"User with {Id} doesn't exist.";
+            if (searchForUser == null) return null;
             _context.AppUsers.Remove(searchForUser);
             await _context.SaveChangesAsync();
             return "User's profile successfully deleted.";
@@ -117,17 +117,16 @@ namespace VatebraAcademy.Services.Implementations
 
         public async Task<AppUserDto> GetProfileById(string Id)
         {
-            var appUser = new AppUserDto(){ };
             var searchForUser = await _userManager.FindByIdAsync(Id);
-            if (searchForUser == null) return appUser;
+            if (searchForUser == null) return null;
             var userToReturn = _mapper.Map<AppUserDto>(searchForUser);
             return userToReturn;
         }
 
         public async Task<string> UpdateProfileById(string Id, UserDto appUser)
         {
-            var searchForUser = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == Id);
-            if (searchForUser == null) return $"User with {Id} doesn't exist.";
+            var searchForUser = await _userManager.FindByIdAsync(Id);
+            if (searchForUser == null) return null;
 
             searchForUser.FirstName = appUser.FirstName;
             searchForUser.LastName = appUser.LastName;

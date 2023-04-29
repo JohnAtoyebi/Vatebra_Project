@@ -25,8 +25,8 @@ namespace VatebraAcademy.Api.Controllers
         public async Task<IActionResult> CreateStudentProfile(UserDto userProfile)
         {
             var getProfile = await _vatebra.CreateProfile(userProfile);
-            if (getProfile == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "creating student profile was unsuccessful", ModelState, null));
+            if(getProfile == null)
+                return BadRequest(Utilities.BuildResponse<object>(true, "creating student profile was unsuccessful... email already exists", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully created student profile", ModelState, getProfile));
         }
 
@@ -36,7 +36,7 @@ namespace VatebraAcademy.Api.Controllers
         {
             var getProfile = await _vatebra.Login(Email, Password);
             if (getProfile == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "error logging in", ModelState, null));
+                return BadRequest(Utilities.BuildResponse<object>(true, "error logging in... make sure you inputted a correct email or password", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully logged into your student profile", ModelState, getProfile));
         }
 
@@ -45,7 +45,7 @@ namespace VatebraAcademy.Api.Controllers
         {
             var getProfile = await _vatebra.GetAllProfiles();
             if(getProfile == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "getting students profile wasn't successful", ModelState, null));
+                return BadRequest(Utilities.BuildResponse<object>(true, "getting students profile wasn't successful", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully got students profile", ModelState, getProfile));
         }
 
@@ -54,8 +54,17 @@ namespace VatebraAcademy.Api.Controllers
         {
             var getUser = await _vatebra.GetProfileById(Id);
             if(getUser == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "getting student profile wasn't successful", ModelState, null));
+                return BadRequest(Utilities.BuildResponse<object>(true, $"getting student profile wasn't successful... {Id} doesn't exist", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully got student profile", ModelState, getUser));
+        }
+
+        [HttpPatch("user-profile/{Id}")]
+        public async Task<IActionResult> UpdateStudentProfile([FromRoute] string Id, UserDto userProfile)
+        {
+            var getUser = await _vatebra.UpdateProfileById(Id, userProfile);
+            if (getUser == null)
+                return BadRequest(Utilities.BuildResponse<object>(true, $"updating student profile wasn't successful...  User with {Id} doesn't exist", ModelState, ""));
+            return Ok(Utilities.BuildResponse<object>(true, "successfully updated student profile", ModelState, getUser));
         }
 
         [HttpDelete("user-profile/{Id}")]
@@ -63,17 +72,8 @@ namespace VatebraAcademy.Api.Controllers
         {
             var deleteUser = await _vatebra.DeleteProfileById(Id);
             if (deleteUser == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "deleting student profile wasn't successful", ModelState, null));
-            return Ok(Utilities.BuildResponse<object>(true, "successfully deleted student profile", ModelState, deleteUser));
-        }
-
-        [HttpPatch("user-profile/{Id}")]
-        public async Task<IActionResult> UpdateStudentProfile([FromRoute]string Id, UserDto userProfile)
-        {
-            var getUser = await _vatebra.UpdateProfileById(Id, userProfile);
-            if (getUser == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "updating student profile wasn't successful", ModelState, null));
-            return Ok(Utilities.BuildResponse<object>(true, "successfully updated student profile", ModelState, getUser));
+                return BadRequest(Utilities.BuildResponse<object>(true, $"deleting student profile wasn't successful... User with {Id} doesn't exist", ModelState, ""));
+            return Ok(Utilities.BuildResponse<object>(true, "successfully deleted student profile", ModelState, ""));
         }
     }
 }
