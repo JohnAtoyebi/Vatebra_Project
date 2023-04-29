@@ -21,7 +21,7 @@ namespace VatebraAcademy.Api.Controllers
 
         [HttpPost("register-profile")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateStudentProfile(AppUserDto userProfile)
+        public async Task<IActionResult> CreateStudentProfile(UserDto userProfile)
         {
             var getProfile = await _vatebra.CreateProfile(userProfile);
             return Ok(getProfile);

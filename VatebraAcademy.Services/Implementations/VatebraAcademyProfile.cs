@@ -39,7 +39,7 @@ namespace VatebraAcademy.Services.Implementations
             _signInManager = signInManager;
             _mapper = mapper;
         }
-        public async Task<string> CreateProfile(AppUserDto appUser)
+        public async Task<string> CreateProfile(UserDto appUser)
         {
             try
             {
