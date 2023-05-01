@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VatebraAcademy.Core;
 using VatebraAcademy.Core.Dtos;
+using VatebraAcademy.Core.PaginationDto;
 using VatebraAcademy.Core.Response;
 using VatebraAcademy.Services.Interfaces;
 
@@ -41,9 +42,9 @@ namespace VatebraAcademy.Api.Controllers
         }
 
         [HttpGet("user-profiles")]
-        public async Task<IActionResult> GetStudentProfiles()
+        public async Task<IActionResult> GetStudentProfiles([FromQuery]PageCount pageCount)
         {
-            var getProfile = await _vatebra.GetAllProfiles();
+            var getProfile = await _vatebra.GetAllProfiles(pageCount.Page, pageCount.PerPage);
             if(getProfile == null)
                 return BadRequest(Utilities.BuildResponse<object>(true, "getting students profile wasn't successful", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully got students profile", ModelState, getProfile));

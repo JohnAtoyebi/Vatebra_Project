@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VatebraAcademy.Core;
 using VatebraAcademy.Core.Dtos;
+using VatebraAcademy.Core.PaginationDto;
 
 namespace VatebraAcademy.Services.Interfaces
 {
@@ -12,7 +13,7 @@ namespace VatebraAcademy.Services.Interfaces
     {
         Task<string> CreateProfile(UserDto appUser);
         Task<string> UpdateProfileById(string Id, UserDto appUser);
-        Task<List<AppUserDto>> GetAllProfiles();
+        Task<PaginatedListDto<AppUserDto>> GetAllProfiles(int page, int perPage);
         Task<AppUserDto> GetProfileById(string Id);
         Task<string> DeleteProfileById(string Id);
         Task<string> GenerateToken(AppUser user);

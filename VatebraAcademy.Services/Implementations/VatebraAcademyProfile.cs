@@ -12,8 +12,10 @@ using System.Text;
 using System.Threading.Tasks;
 using VatebraAcademy.Core;
 using VatebraAcademy.Core.Dtos;
+using VatebraAcademy.Core.PaginationDto;
 using VatebraAcademy.Data;
 using VatebraAcademy.Services.Interfaces;
+using static VatebraAcademy.Core.PaginationDto.Pagination;
 
 namespace VatebraAcademy.Services.Implementations
 {
@@ -106,13 +108,13 @@ namespace VatebraAcademy.Services.Implementations
             return "User's profile successfully deleted.";
         }
 
-        public async Task<List<AppUserDto>> GetAllProfiles()
+        public async Task<PaginatedListDto<AppUserDto>> GetAllProfiles(int page, int perPage)
         {
-            var appUser = new List<AppUserDto>();
             var searchForUser = await _context.AppUsers.ToListAsync();
-            if (searchForUser == null) return appUser;
+            if (searchForUser == null) return null;
             var userToReturn = _mapper.Map<List<AppUserDto>>(searchForUser);
-            return userToReturn;
+            var user = Pagnation<AppUserDto>.Paginate(userToReturn, page, perPage);
+            return user;
         }
 
         public async Task<AppUserDto> GetProfileById(string Id)
