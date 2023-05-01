@@ -42,7 +42,6 @@ namespace VatebraAcademy.Api.Controllers
         }
 
         [HttpGet("user-profiles")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetStudentProfiles([FromQuery]PageCount pageCount)
         {
             var getProfile = await _vatebra.GetAllProfiles(pageCount.Page, pageCount.PerPage);
