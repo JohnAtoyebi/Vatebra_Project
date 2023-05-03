@@ -27,7 +27,7 @@ namespace VatebraAcademy.Api.Controllers
         {
             var getProfile = await _vatebra.CreateProfile(userProfile);
             if(getProfile == null)
-                return BadRequest(Utilities.BuildResponse<object>(true, "creating student profile was unsuccessful... email already exists", ModelState, ""));
+                return BadRequest(Utilities.BuildResponse<object>(true, "creating student profile was unsuccessful... email or phone number already exists", ModelState, ""));
             return Ok(Utilities.BuildResponse<object>(true, "successfully created student profile", ModelState, getProfile));
         }
 
