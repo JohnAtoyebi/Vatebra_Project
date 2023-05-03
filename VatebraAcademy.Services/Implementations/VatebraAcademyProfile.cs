@@ -46,7 +46,8 @@ namespace VatebraAcademy.Services.Implementations
             try
             {
                 var getEmail = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == appUser.Email);
-                if (getEmail != null) return null;
+                var getPhoneNumber = await _context.AppUsers.FirstOrDefaultAsync(x => x.PhoneNumber == appUser.PhoneNumber);
+                if (getEmail != null || getPhoneNumber != null) return null;
 
                 if (await _roleManager.FindByNameAsync("AppUser") == null)
                     await _roleManager.CreateAsync(new IdentityRole("AppUser"));
