@@ -10,6 +10,7 @@ using VatebraAcademy.Services.Interfaces;
 
 namespace VatebraAcademy.Api.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
